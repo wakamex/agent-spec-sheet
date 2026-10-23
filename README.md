@@ -46,7 +46,7 @@ Each root has a Wakterm override (`WAKTERM_AGENT_CLAUDE_DIR`, `WAKTERM_AGENT_COD
 | Devin's `credentials.toml` and session store | clanker-usage, AOP, Wakterm |
 | Claude Code's `.credentials.json` | clanker-usage, AOP |
 | Which lab each harness's model names belong to | model-prices, clanker-analytics, AOP |
-| Gemini CLI's home, `GEMINI_CLI_HOME` | clanker-usage, clanker-analytics |
+| Gemini CLI's home, `GEMINI_CLI_HOME` | Wakterm, clanker-usage, clanker-analytics |
 
 Most rows are one line of code each: a variable and a default path. The copies differ where one consumer learned something the others did not, and the first row shows the cost: `CLAUDE_CONFIG_DIR` was missing from AOP, clanker-analytics and Wakterm, each found separately.
 
@@ -90,7 +90,7 @@ Wakterm meets the trigger this README set for a shared description: a consumer t
 
 The file replaces the hand-written history table in the agents' shared instructions, so there is one list of where history lives and who reads it.
 
-The file already shows copies that disagree with it: Wakterm ignores `GEMINI_CLI_HOME`, and `XDG_DATA_HOME` for OpenCode, which sch honors. clanker-analytics read only the older JSON Gemini CLI chats, so it counted no Gemini CLI usage from 2026-03-29 until it began reading the JSON Lines chats too.
+Writing the file found copies that disagreed with it: Wakterm ignored `GEMINI_CLI_HOME`, and `XDG_DATA_HOME` for OpenCode, which sch honors, and clanker-analytics read only the older JSON Gemini CLI chats, so it counted no Gemini CLI usage from 2026-03-29 until it began reading the JSON Lines chats too.
 
 Each consumer keeps its own constants and resolvers, vendors a pinned copy of the file, and has a test that its resolvers give the file's answers, including with the moving variable set, and that the harnesses it reads match its entries in `readers`. Picking up a change means updating the vendored copy, so no consumer's release waits on another's. A data file also suits a Rust consumer and Python consumers equally, where a library would have to be written for one language. Add a version range to an entry when a harness's layout differs by version, as DeepSeek Harness's credentials did between 0.1 and 0.2.
 
@@ -109,7 +109,7 @@ A library that consumers import at run time would add a published package that s
 
 - clanker-analytics reads `~/.codex/archived_sessions/` and every Claude Code home's transcripts. The fix is committed but not yet pushed.
 - AOP seeds Claude runs from `CLAUDE_CONFIG_DIR` as of v0.4.0.
-- Wakterm finds Claude Code and Codex sessions under the home each pane's process uses. The fix is committed but not yet pushed.
+- Wakterm finds Claude Code, Codex, Gemini CLI and OpenCode sessions under the home each pane's process uses, reading `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GEMINI_CLI_HOME` and `XDG_DATA_HOME` from that process's environment. The fix is committed but not yet pushed.
 
 ## A running service is out of scope
 
