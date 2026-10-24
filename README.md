@@ -109,7 +109,7 @@ A library that consumers import at run time would add a published package that s
 
 - clanker-analytics reads `~/.codex/archived_sessions/` and every Claude Code home's transcripts. The fix is committed but not yet pushed.
 - AOP seeds Claude runs from `CLAUDE_CONFIG_DIR` as of v0.4.0.
-- Wakterm finds Claude Code, Codex, Gemini CLI and OpenCode sessions under the home each pane's process uses, reading `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GEMINI_CLI_HOME` and `XDG_DATA_HOME` from that process's environment. The fix is committed but not yet pushed.
+- Wakterm finds Claude Code, Codex, Gemini CLI and OpenCode sessions under the home each pane's process uses, reading `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GEMINI_CLI_HOME` and `XDG_DATA_HOME` from that process's environment.
 
 ## A running service is out of scope
 
