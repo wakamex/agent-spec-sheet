@@ -2,7 +2,7 @@
 
 Question: would a shared description of each coding-agent harness help the projects that read harness files on this host? Here a harness is a coding-agent CLI such as Claude Code, Codex, Antigravity (agy), Gemini CLI, Cursor's agent, Devin, DeepSeek Harness (dsh), Grok, Hermes, Muse Code, OpenCode or Zcode. Its specification is the set of facts other programs need about it: where it keeps its home directory and which variable moves it, where its credentials and session history live and in what format, how it names models, how to read its version, and how it is updated.
 
-Answer: two things, in this order of value. First, a daily check against the installed harnesses that runs each consumer's own probes: most harness changes that broke these projects from 2026-10-14 to 2026-10-23 were changes in behavior, which no description of files prevents, and a check would have reported most of them on the day. Second, a small data file of home directories and session history locations, which consumers test their own constants against. Wakterm reads the live sessions of seven harnesses, which meets this README's trigger for the data file, and the same home-directory fact has now been missing from three consumers. A runtime library stays deferred.
+Answer: two things, in this order of value. First, a daily check against the installed harnesses that runs each consumer's own probes: most harness changes that broke these projects from 2026-10-14 to 2026-10-23 were changes in behavior, which no description of files prevents, and a check would have reported most of them on the day. Second, a small data file of home directories and session history locations, which consumers test their own constants against. Wakterm reads the live sessions of eight harnesses, which meets this README's trigger for the data file, and the same home-directory fact has now been missing from three consumers. A runtime library stays deferred.
 
 How this was judged: by counting which harness facts each consumer hard-codes, and by listing the harness changes those consumers absorbed from 2026-10-14 to 2026-10-23. The per-consumer findings for three of them are in [aop.md](aop.md), [clanker-analytics.md](clanker-analytics.md) and [model-prices.md](model-prices.md); Wakterm's are below.
 
@@ -29,6 +29,7 @@ How this was judged: by counting which harness facts each consumer hard-codes, a
 | Gemini CLI | session files under `~/.gemini/` |
 | OpenCode and Zcode | OpenCode's SQLite schema, in each harness's own database |
 | Devin | `~/.local/share/devin/cli/sessions.db` (tables `sessions` and `message_nodes`), and `session_locks/<name>.lock` to bind a pane to the session its process holds |
+| Muse Code | `sessions/YYYY/MM/DD/<session id>/session.jsonl` under `${XDG_DATA_HOME:-~/.local/share}/muse`, read from the data directory of each pane's process |
 
 AOP's Devin knowledge covers headless runs and their trajectory export, which a live pane observer cannot use, so Wakterm shares only the path with it.
 
@@ -47,6 +48,8 @@ Each root has a Wakterm override (`WAKTERM_AGENT_CLAUDE_DIR`, `WAKTERM_AGENT_COD
 | Claude Code's `.credentials.json` | clanker-usage, AOP |
 | Which lab each harness's model names belong to | model-prices, clanker-analytics, AOP |
 | Gemini CLI's home, `GEMINI_CLI_HOME` | Wakterm, clanker-usage, clanker-analytics |
+| Muse Code's data directory, `${XDG_DATA_HOME:-~/.local/share}/muse`, and its session logs | Wakterm, sch, clanker-analytics |
+| Muse Code's config directory and login, `${XDG_CONFIG_HOME:-~/.config}/muse/auth.json` | clanker-usage, AOP |
 
 Most rows are one line of code each: a variable and a default path. The copies differ where one consumer learned something the others did not, and the first row shows the cost: `CLAUDE_CONFIG_DIR` was missing from AOP, clanker-analytics and Wakterm, each found separately.
 
@@ -81,7 +84,7 @@ The check compares fields that consumers read, not the full structure of every f
 
 ## The data file covers homes and session history
 
-Wakterm meets the trigger this README set for a shared description: a consumer that needs the facts of three or more harnesses, and it reads seven. The `CLAUDE_CONFIG_DIR` gap in three consumers shows what the copies cost, and sch showed a second cost: it recorded Antigravity as unreadable because it looked only at the editor's protobuf folder, while clanker-analytics had read agy's JSON Lines transcripts for two months. So the first shared artifact is [harnesses.toml](harnesses.toml), holding per harness:
+Wakterm meets the trigger this README set for a shared description: a consumer that needs the facts of three or more harnesses, and it reads eight. The `CLAUDE_CONFIG_DIR` gap in three consumers shows what the copies cost, and sch showed a second cost: it recorded Antigravity as unreadable because it looked only at the editor's protobuf folder, while clanker-analytics had read agy's JSON Lines transcripts for two months. So the first shared artifact is [harnesses.toml](harnesses.toml), holding per harness:
 
 - its home, written as `${VAR:-default}` so the variable that moves it and the default are one value, such as `${CLAUDE_CONFIG_DIR:-~/.claude}`;
 - every file or database that holds sessions, relative to the home, including archives such as Codex's `archived_sessions/`;
@@ -93,6 +96,8 @@ The file replaces the hand-written history table in the agents' shared instructi
 Writing the file found copies that disagreed with it: Wakterm ignored `GEMINI_CLI_HOME`, and `XDG_DATA_HOME` for OpenCode, which sch honors, and clanker-analytics read only the older JSON Gemini CLI chats, so it counted no Gemini CLI usage from 2026-03-29 until it began reading the JSON Lines chats too.
 
 Each consumer keeps its own constants and resolvers, vendors a pinned copy of the file, and has a test that its resolvers give the file's answers, including with the moving variable set, and that the harnesses it reads match its entries in `readers`. Picking up a change means updating the vendored copy, so no consumer's release waits on another's. A data file also suits a Rust consumer and Python consumers equally, where a library would have to be written for one language. Add a version range to an entry when a harness's layout differs by version, as DeepSeek Harness's credentials did between 0.1 and 0.2.
+
+sch vendors the file and tests against it. Wakterm and clanker-analytics are listed as readers and are adding the same test.
 
 Publish the file at a stable URL, such as `waka.mx/ass`, as the copy that people, agents and vendoring consumers read. No consumer fetches it at run time: that would make offline use and every public package depend on the website, and one bad edit would break every consumer at once instead of failing one consumer's tests. The daily check compares each consumer's vendored copy with the published one and reports a consumer that has fallen behind.
 
@@ -107,7 +112,7 @@ A library that consumers import at run time would add a published package that s
 
 ## Local fixes
 
-- clanker-analytics reads `~/.codex/archived_sessions/` and every Claude Code home's transcripts. The fix is committed but not yet pushed.
+- clanker-analytics reads `~/.codex/archived_sessions/`, every Claude Code home's transcripts, and Gemini CLI's JSON Lines chats under `GEMINI_CLI_HOME`, as of v0.5.2.
 - AOP seeds Claude runs from `CLAUDE_CONFIG_DIR` as of v0.4.0.
 - Wakterm finds Claude Code, Codex, Gemini CLI and OpenCode sessions under the home each pane's process uses, reading `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GEMINI_CLI_HOME` and `XDG_DATA_HOME` from that process's environment.
 
