@@ -97,7 +97,7 @@ Writing the file found copies that disagreed with it: Wakterm ignored `GEMINI_CL
 
 Each consumer keeps its own constants and resolvers, vendors a pinned copy of the file, and has a test that its resolvers give the file's answers, including with the moving variable set, and that the harnesses it reads match its entries in `readers`. Picking up a change means updating the vendored copy, so no consumer's release waits on another's. A data file also suits a Rust consumer and Python consumers equally, where a library would have to be written for one language. Add a version range to an entry when a harness's layout differs by version, as DeepSeek Harness's credentials did between 0.1 and 0.2.
 
-sch vendors the file and tests against it. Wakterm and clanker-analytics are listed as readers and are adding the same test.
+sch, Wakterm and clanker-analytics each vendor the file and test against it. The tests found two copies that disagreed with it on their first runs: clanker-analytics read Codex history only from `~/.codex`, ignoring `CODEX_HOME`, and the file gave Devin a fixed home although Devin follows `XDG_DATA_HOME`.
 
 Publish the file at a stable URL, such as `waka.mx/ass`, as the copy that people, agents and vendoring consumers read. No consumer fetches it at run time: that would make offline use and every public package depend on the website, and one bad edit would break every consumer at once instead of failing one consumer's tests. The daily check compares each consumer's vendored copy with the published one and reports a consumer that has fallen behind.
 
