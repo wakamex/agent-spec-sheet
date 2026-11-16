@@ -2,7 +2,7 @@
 
 Question: would a shared description of each coding-agent harness help the projects that read harness files on this host? Here a harness is a coding-agent CLI such as Claude Code, Codex, Antigravity (agy), Gemini CLI, Cursor's agent, Devin, DeepSeek Harness (dsh), Grok, Hermes, Muse Code, OpenCode or Zcode. Its specification is the set of facts other programs need about it: where it keeps its home directory and which variable moves it, where its credentials and session history live and in what format, how it names models, how to read its version, and how it is updated.
 
-Answer: two things, in this order of value. First, a daily check against the installed harnesses that runs each consumer's own probes: most harness changes that broke these projects from 2026-10-14 to 2026-10-23 were changes in behavior, which no description of files prevents, and a check would have reported most of them on the day. Second, a small data file of home directories and session history locations, which consumers test their own constants against. Wakterm reads the live sessions of eight harnesses, which meets this README's trigger for the data file, and the same home-directory fact has now been missing from three consumers. A runtime library stays deferred.
+Answer: two things, in this order of value. First, a daily check against the installed harnesses that runs each consumer's own probes: most harness changes that broke these projects from 2026-10-14 to 2026-10-23 were changes in behavior, which no description of files prevents, and a check would have reported most of them on the day. Second, a small data file of home directories and session history locations, which consumers test their own constants against. Wakterm reads the live sessions of nine harnesses, which meets this README's trigger for the data file, and the same home-directory fact has now been missing from three consumers. A runtime library stays deferred.
 
 How this was judged: by counting which harness facts each consumer hard-codes, and by listing the harness changes those consumers absorbed from 2026-10-14 to 2026-10-23. The per-consumer findings for three of them are in [aop.md](aop.md), [clanker-analytics.md](clanker-analytics.md) and [model-prices.md](model-prices.md); Wakterm's are below.
 
@@ -30,6 +30,7 @@ How this was judged: by counting which harness facts each consumer hard-codes, a
 | OpenCode and Zcode | OpenCode's SQLite schema, in each harness's own database |
 | Devin | `~/.local/share/devin/cli/sessions.db` (tables `sessions` and `message_nodes`), and `session_locks/<name>.lock` to bind a pane to the session its process holds |
 | Muse Code | `sessions/YYYY/MM/DD/<session id>/session.jsonl` under `${XDG_DATA_HOME:-~/.local/share}/muse`, read from the data directory of each pane's process |
+| [endchat](https://github.com/wakamex/endchat) | `state.json` and `turns.jsonl` in the chat's profile directory, `~/.endchat/<name>` |
 
 AOP's Devin knowledge covers headless runs and their trajectory export, which a live pane observer cannot use, so Wakterm shares only the path with it.
 
