@@ -6,6 +6,12 @@
 # readers: the tools on this host that read the history. Each reader's tests check its own path
 #   constants against this file. Check this file and those readers' code before deciding a harness's
 #   history cannot be read.
+#
+# AOP runs each harness in a private home inside the run's state root, under
+# <state root>/provider-state/<name>/<provider>/, and lists every state root it has used, one per
+# line, in ${XDG_STATE_HOME:-~/.local/state}/aop/state-roots. An agy run's home is
+# provider-state/<name>/agy/gemini/antigravity-cli and a Claude run's is
+# provider-state/<name>/claude/home/.claude; the sessions paths below apply inside them.
 
 [claude]
 name = "Claude Code"
